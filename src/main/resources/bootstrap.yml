@@ -1,0 +1,23 @@
+server:
+  port: 9092
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: service-zuul
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    # 服务注册
+    register-with-eureka: true
+    # 服务发现
+    fetch-registry: true
+zuul:
+  routes:
+    service-base:
+      path: /service-base/**
+      serviceId: service-base
+    service-auth:
+      path: /service-auth/**
+      serviceId: service-auth
