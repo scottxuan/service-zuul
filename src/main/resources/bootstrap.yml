@@ -5,10 +5,10 @@ spring:
     active: @profileActive@
   application:
     name: service-zuul
-  security:
-    user:
-      name: admin
-      password: admin
+#  security:
+#    user:
+#      name: admin
+#      password: admin
 eureka:
   instance:
     prefer-ip-address: true
@@ -25,3 +25,6 @@ zuul:
     service-auth:
       path: /service-auth/**
       serviceId: service-auth
+    service-user:
+      path: /service-user/**
+      serviceId: service-user
