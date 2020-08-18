@@ -26,5 +26,5 @@ zuul:
       path: /service-auth/**
       serviceId: service-auth
     service-user:
-      path: /service-user/**
-      serviceId: service-user
+      path: /service-system/**
+      serviceId: service-system
