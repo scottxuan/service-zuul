@@ -1,5 +1,5 @@
 server:
-  port: 9092
+  port: 9100
 spring:
   profiles:
     active: @profileActive@
@@ -25,6 +25,6 @@ zuul:
     service-auth:
       path: /service-auth/**
       serviceId: service-auth
-    service-user:
+    service-system:
       path: /service-system/**
       serviceId: service-system
