@@ -1,8 +1,11 @@
 package com.service.zuul.filters;
 
+import com.module.common.error.ErrorCodes;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import com.scottxuan.base.utils.JsonUtils;
+import com.scottxuan.web.result.ResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
@@ -41,15 +44,16 @@ public class ErrorFilter extends ZuulFilter {
         try {
             RequestContext context = RequestContext.getCurrentContext();
             ZuulException exception = this.findZuulException(context.getThrowable());
-            log.error("进入系统异常拦截", exception);
-
             HttpServletResponse response = context.getResponse();
             response.setContentType("application/json; charset=utf8");
             response.setStatus(exception.nStatusCode);
             PrintWriter writer = null;
             try {
                 writer = response.getWriter();
-                writer.print("{code:"+ exception.nStatusCode +",message:\""+ exception.getMessage() +"\"}");
+                ResultDto<Object> dto = new ResultDto<>();
+                dto.setCode(exception.nStatusCode);
+                dto.setMessage(exception.getMessage());
+                writer.print(JsonUtils.toJsonString(dto));
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -57,11 +61,9 @@ public class ErrorFilter extends ZuulFilter {
                     writer.close();
                 }
             }
-
         } catch (Exception var5) {
             ReflectionUtils.rethrowRuntimeException(var5);
         }
-
         return null;
     }
 
@@ -73,5 +75,8 @@ public class ErrorFilter extends ZuulFilter {
         } else {
             return ZuulException.class.isInstance(throwable) ? (ZuulException)throwable : new ZuulException(throwable, 500, (String)null);
         }
+//        log.error("zuul error",throwable);
+//        ResultDto<Object> dto = new ResultDto<>(ErrorCodes.SYS_ERROR_500);
+//        return new ZuulException(dto.getMessage(), dto.getCode(), dto.getMessage());
     }
 }

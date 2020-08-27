@@ -53,6 +53,7 @@
                     <include>bootstrap.yml</include>
                     <include>bootstrap-${profileActive}.yml</include>
                     <include>/**.xml</include>
+                    <include>/**.key</include>
                 </includes>
             </resource>
         </resources>

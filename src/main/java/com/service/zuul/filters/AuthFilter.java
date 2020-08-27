@@ -1,5 +1,7 @@
 package com.service.zuul.filters;
 
+import com.google.common.collect.Lists;
+import com.module.common.constants.ServiceConstant;
 import com.module.common.error.ErrorCodes;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -16,6 +18,7 @@ import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author : pc
@@ -43,10 +46,13 @@ public class AuthFilter extends ZuulFilter {
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
         String uri = request.getRequestURI();
-        String[] split = uri.split("/");
-        String url = request.getRequestURL().toString();
-        log.info("uri : {}", uri);
-        log.info("url : {}", url);
+        if (!uri.contains(ServiceConstant.SERVICE_API_COMMON)){
+            return false;
+        }
+//        List<String> list = Lists.newArrayList();
+//        if (list.contains(uri)) {
+//            return true;
+//        }
         return true;
     }
 
