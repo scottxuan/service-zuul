@@ -15,9 +15,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.logistics.modules</groupId>
-            <artifactId>module-auth</artifactId>
-            <version>${module-auth.version}</version>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
         </dependency>
         <dependency>
             <groupId>com.scottxuan.basic</groupId>
