@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.logistics.modules</groupId>
+            <artifactId>module-auth</artifactId>
+            <version>${module-auth.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.scottxuan.basic</groupId>
             <artifactId>basic-web</artifactId>
             <version>${basic-web.version}</version>
@@ -29,16 +34,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
         </dependency>
-<!--        &lt;!&ndash; oauth2 &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-oauth2</artifactId>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash; security &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-security</artifactId>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
