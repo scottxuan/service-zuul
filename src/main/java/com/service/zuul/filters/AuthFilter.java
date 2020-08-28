@@ -1,14 +1,11 @@
 package com.service.zuul.filters;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.module.common.constants.ServiceConstant;
 import com.module.common.error.ErrorCodes;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import com.scottxuan.base.exception.BizException;
-import com.scottxuan.base.exception.ExceptionUtils;
 import com.scottxuan.web.result.ResultDto;
 import com.service.zuul.enums.UrlType;
 import com.service.zuul.service.JwtParseService;
@@ -20,7 +17,6 @@ import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +27,7 @@ import java.util.Map;
 @Component
 public class AuthFilter extends ZuulFilter {
 
-    private static final String pathSeparator = "/";
+    private static final String PATH_SEPARATOR = "/";
 
     @Autowired
     private JwtParseService jwtParseService;
@@ -48,8 +44,8 @@ public class AuthFilter extends ZuulFilter {
 
     private Map<String, UrlType> getFilterChain() {
         Map<String, UrlType> map = Maps.newLinkedHashMap();
-        map.put("/api/v1/auth/**", UrlType.ANON);
-        map.put("/api/v1/**", UrlType.AUTH);
+        map.put("/service-auth/api/v1/auth/**", UrlType.ANON);
+        map.put("/*/api/v1/**", UrlType.AUTH);
         map.put("/**", UrlType.ANON);
         return map;
     }
@@ -66,11 +62,8 @@ public class AuthFilter extends ZuulFilter {
         if (!forwardPath.contains(ServiceConstant.SERVICE_API_COMMON)) {
             return false;
         }
-        String path1 = forwardPath.substring(1);
-        int i1 = path1.indexOf(pathSeparator);
-        String path = path1.substring(i1);
         for (String pattern : filterChain.keySet()) {
-            boolean match = doMatch(pattern, path, true);
+            boolean match = doMatch(pattern, forwardPath, true);
             if (match) {
                 UrlType urlType = filterChain.get(pattern);
                 if (urlType == UrlType.AUTH) {
@@ -103,11 +96,11 @@ public class AuthFilter extends ZuulFilter {
     }
 
     private boolean doMatch(String pattern, String path, boolean fullMatch) {
-        if (path.startsWith(pathSeparator) != pattern.startsWith(pathSeparator)) {
+        if (path.startsWith(PATH_SEPARATOR) != pattern.startsWith(PATH_SEPARATOR)) {
             return false;
         }
-        String[] pattDirs = pattern.substring(1).split(pathSeparator);
-        String[] pathDirs = path.substring(1).split(pathSeparator);
+        String[] pattDirs = pattern.substring(1).split(PATH_SEPARATOR);
+        String[] pathDirs = path.substring(1).split(PATH_SEPARATOR);
         int pattIdxStart = 0;
         int pattIdxEnd = pattDirs.length - 1;
         int pathIdxStart = 0;
@@ -127,14 +120,14 @@ public class AuthFilter extends ZuulFilter {
         if (pathIdxStart > pathIdxEnd) {
             // Path is exhausted, only match if rest of pattern is * or **'s
             if (pattIdxStart > pattIdxEnd) {
-                return (pattern.endsWith(pathSeparator) ?
-                        path.endsWith(pathSeparator) : !path.endsWith(pathSeparator));
+                return (pattern.endsWith(PATH_SEPARATOR) ?
+                        path.endsWith(PATH_SEPARATOR) : !path.endsWith(PATH_SEPARATOR));
             }
             if (!fullMatch) {
                 return true;
             }
             if (pattIdxStart == pattIdxEnd && pattDirs[pattIdxStart].equals("*") &&
-                    path.endsWith(pathSeparator)) {
+                    path.endsWith(PATH_SEPARATOR)) {
                 return true;
             }
             for (int i = pattIdxStart; i <= pattIdxEnd; i++) {
