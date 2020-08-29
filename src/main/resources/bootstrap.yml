@@ -1,0 +1,42 @@
+server:
+  port: 9100
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: service-zuul
+  messages:
+    basename: i18n/common/message,i18n/biz/message
+  resources:
+    add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+  main:
+    allow-bean-definition-overriding: true
+#  security:
+#    user:
+#      name: admin
+#      password: admin
+api: /api/v1
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    # 服务注册
+    register-with-eureka: true
+    # 服务发现
+    fetch-registry: true
+zuul:
+  SendErrorFilter:
+    error:
+      disable: true
+  routes:
+    service-base:
+      path: /service-base/**
+      serviceId: service-base
+    service-auth:
+      path: /service-auth/**
+      serviceId: service-auth
+    service-system:
+      path: /service-system/**
+      serviceId: service-system

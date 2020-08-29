@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://111.229.120.182:3306/mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      username: root
+      password: zhaoxuan734
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    database: 0
+    host: 111.229.120.182
+    port: 6379
+    password: zhaoxuan734
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+    timeout: 5000
+  rabbitmq:
+    host: 111.229.120.182
+    port: 5672
+    username: zhaoxuan
+    password: zhaoxuan734
+    virtual-host: /
+  cloud:
+#    config:
+#      label: test
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://111.229.120.182:9000/eureka
