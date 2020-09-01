@@ -1,6 +1,8 @@
 package com.service.zuul.filters;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.module.common.constants.JwtConstant;
 import com.module.common.constants.ServiceConstant;
 import com.module.common.error.ErrorCodes;
 import com.netflix.zuul.ZuulFilter;
@@ -9,6 +11,7 @@ import com.netflix.zuul.exception.ZuulException;
 import com.scottxuan.web.result.ResultDto;
 import com.service.zuul.enums.UrlType;
 import com.service.zuul.service.JwtParseService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +20,7 @@ import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -76,14 +80,22 @@ public class AuthFilter extends ZuulFilter {
     public Object run() throws ZuulException {
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
-        String accessToken = request.getHeader("accessToken");
+        String accessToken = request.getHeader(JwtConstant.ACCESS_TOKEN);
         if (StringUtils.isBlank(accessToken)) {
             log.error("accessToken is blank");
             ResultDto<Object> dto = new ResultDto<>(ErrorCodes.SYS_ERROR_401);
             throw new ZuulException(dto.getMessage(), dto.getCode(), dto.getMessage());
         }
         try {
-            jwtParseService.parseToken(accessToken);
+            Claims claims = jwtParseService.parseToken(accessToken);
+//            request.getParameterMap();
+//            Map<String, List<String>> requestQueryParams = context.getRequestQueryParams();
+//            if (requestQueryParams==null) {
+//                requestQueryParams=Maps.newHashMap();
+//            }
+//            Object userId = claims.get(JwtConstant.USER_ID);
+//            requestQueryParams.put(JwtConstant.USER_ID, Lists.newArrayList(userId.toString()));
+//            context.setRequestQueryParams(requestQueryParams);
         } catch (ExpiredJwtException e) {
             log.error("no search accessToken");
             ResultDto<Object> dto = new ResultDto<>(ErrorCodes.ACCESS_TOKEN_TIME_OUT);

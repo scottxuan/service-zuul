@@ -76,7 +76,7 @@ public class PermissionFilter extends ZuulFilter {
     public Object run() throws ZuulException {
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
-        String accessToken = request.getHeader("accessToken");
+        String accessToken = request.getHeader(JwtConstant.ACCESS_TOKEN);
         if (StringUtils.isBlank(accessToken)) {
             log.info("user no has permission, accessToken is blank");
             ResultDto<Object> dto = new ResultDto<>(ErrorCodes.SYS_ERROR_403);
