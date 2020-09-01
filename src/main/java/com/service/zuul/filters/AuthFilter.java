@@ -66,10 +66,7 @@ public class AuthFilter extends ZuulFilter {
             boolean match = doMatch(pattern, forwardPath, true);
             if (match) {
                 UrlType urlType = filterChain.get(pattern);
-                if (urlType == UrlType.AUTH) {
-                    return true;
-                }
-                return false;
+                return urlType == UrlType.AUTH;
             }
         }
         return false;
@@ -120,8 +117,7 @@ public class AuthFilter extends ZuulFilter {
         if (pathIdxStart > pathIdxEnd) {
             // Path is exhausted, only match if rest of pattern is * or **'s
             if (pattIdxStart > pattIdxEnd) {
-                return (pattern.endsWith(PATH_SEPARATOR) ?
-                        path.endsWith(PATH_SEPARATOR) : !path.endsWith(PATH_SEPARATOR));
+                return (pattern.endsWith(PATH_SEPARATOR) == path.endsWith(PATH_SEPARATOR));
             }
             if (!fullMatch) {
                 return true;
@@ -185,8 +181,8 @@ public class AuthFilter extends ZuulFilter {
             strLoop:
             for (int i = 0; i <= strLength - patLength; i++) {
                 for (int j = 0; j < patLength; j++) {
-                    String subPat = (String) pattDirs[pattIdxStart + j + 1];
-                    String subStr = (String) pathDirs[pathIdxStart + i + j];
+                    String subPat = pattDirs[pattIdxStart + j + 1];
+                    String subStr = pathDirs[pathIdxStart + i + j];
                     if (!matchStrings(subPat, subStr)) {
                         continue strLoop;
                     }
