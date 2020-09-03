@@ -1,11 +1,9 @@
-package com.service.zuul.service.impl;
+package com.service.zuul.utils;
 
 import com.scottxuan.base.utils.RSAUtils;
-import com.service.zuul.service.JwtParseService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,13 +15,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author : pc
  * @date : 2020/8/27
  */
-@Service
-public class JwtParseServiceImpl implements JwtParseService {
+public class JwtUtil{
     private static PublicKey publicKey = null;
     private static final AtomicBoolean PUBLIC_KEY_IS_LOAD = new AtomicBoolean(true);
 
-    @Override
-    public Claims parseToken(String token) {
+    public static Claims parseToken(String token) {
         if(PUBLIC_KEY_IS_LOAD.compareAndSet(true,false) || publicKey == null){
             publicKey = getPublicKey();
         }
@@ -33,7 +29,7 @@ public class JwtParseServiceImpl implements JwtParseService {
         return claimsJws.getBody();
     }
 
-    public PublicKey getPublicKey() {
+    public static PublicKey getPublicKey() {
         BufferedReader bufferedReader = null;
         PublicKey publicKey = null;
         try {

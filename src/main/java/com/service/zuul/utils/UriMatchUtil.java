@@ -1,102 +1,10 @@
-package com.service.zuul.filters;
+package com.service.zuul.utils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.module.common.constants.JwtConstant;
-import com.module.common.constants.ServiceConstant;
-import com.module.common.error.ErrorCodes;
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
-import com.scottxuan.web.result.ResultDto;
-import com.service.zuul.enums.UrlType;
-import com.service.zuul.service.JwtParseService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author : pc
- * @date : 2020/8/27
- */
-@Slf4j
-@Component
-public class PermissionFilter extends ZuulFilter {
+public class UriMatchUtil {
 
     private static final String PATH_SEPARATOR = "/";
 
-    @Autowired
-    private JwtParseService jwtParseService;
-
-    @Override
-    public String filterType() {
-        return FilterConstants.PRE_TYPE;
-    }
-
-    @Override
-    public int filterOrder() {
-        return FilterConstants.SEND_ERROR_FILTER_ORDER + 2;
-    }
-
-    private Map<String, List<String>> getPermissionChain() {
-        Map<String, List<String>> map = Maps.newHashMap();
-        map.put("/service-auth/api/v1/auth/token/refresh", Lists.newArrayList("admin1", "admin2"));
-        return map;
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        RequestContext context = RequestContext.getCurrentContext();
-        HttpServletRequest request = context.getRequest();
-        String uri = request.getRequestURI();
-        List<String> matchPermission = getMatchPermission(uri);
-        return !matchPermission.isEmpty();
-    }
-
-    private List<String> getMatchPermission(String path) {
-        Map<String, List<String>> permissionChain = getPermissionChain();
-        for (String permissionPath : permissionChain.keySet()) {
-            boolean match = doMatch(permissionPath, path, true);
-            if (match) {
-                return permissionChain.get(permissionPath);
-            }
-        }
-        return Lists.newArrayList();
-    }
-
-    @Override
-    public Object run() throws ZuulException {
-        RequestContext context = RequestContext.getCurrentContext();
-        HttpServletRequest request = context.getRequest();
-        String accessToken = request.getHeader(JwtConstant.ACCESS_TOKEN);
-        if (StringUtils.isBlank(accessToken)) {
-            log.info("user no has permission, accessToken is blank");
-            ResultDto<Object> dto = new ResultDto<>(ErrorCodes.SYS_ERROR_403);
-            throw new ZuulException(dto.getMessage(), dto.getCode(), dto.getMessage());
-        }
-        Claims claims = jwtParseService.parseToken(accessToken);
-        List<String> permissions = (List<String>)claims.get(JwtConstant.PERMISSIONS);
-        String uri = request.getRequestURI();
-        List<String> matchPermissions = getMatchPermission(uri);
-        for (String matchPermission : matchPermissions) {
-            if (!permissions.contains(matchPermission)){
-                log.info("user no has permission : {}",matchPermission);
-                ResultDto<Object> dto = new ResultDto<>(ErrorCodes.SYS_ERROR_403);
-                throw new ZuulException(dto.getMessage(), dto.getCode(), dto.getMessage());
-            }
-        }
-        return null;
-    }
-
-    private boolean doMatch(String pattern, String path, boolean fullMatch) {
+    public static boolean doMatch(String pattern, String path) {
         if (path.startsWith(PATH_SEPARATOR) != pattern.startsWith(PATH_SEPARATOR)) {
             return false;
         }
@@ -123,9 +31,6 @@ public class PermissionFilter extends ZuulFilter {
             if (pattIdxStart > pattIdxEnd) {
                 return (pattern.endsWith(PATH_SEPARATOR) == path.endsWith(PATH_SEPARATOR));
             }
-            if (!fullMatch) {
-                return true;
-            }
             if (pattIdxStart == pattIdxEnd && pattDirs[pattIdxStart].equals("*") &&
                     path.endsWith(PATH_SEPARATOR)) {
                 return true;
@@ -139,9 +44,6 @@ public class PermissionFilter extends ZuulFilter {
         } else if (pattIdxStart > pattIdxEnd) {
             // String not exhausted, but pattern is. Failure.
             return false;
-        } else if (!fullMatch && "**".equals(pattDirs[pattIdxStart])) {
-            // Path start definitely matches due to "**" part in pattern.
-            return true;
         }
         // up to last '**'
         while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
@@ -208,7 +110,7 @@ public class PermissionFilter extends ZuulFilter {
         return true;
     }
 
-    private boolean matchStrings(String pattern, String str) {
+    private static boolean matchStrings(String pattern, String str) {
         char[] patArr = pattern.toCharArray();
         char[] strArr = str.toCharArray();
         int patIdxStart = 0;
