@@ -1,21 +1,20 @@
 package com.service.zuul.filters;
 
-import com.module.common.constants.JwtConstant;
-import com.module.common.constants.ServiceConstant;
-import com.module.common.error.ErrorCodes;
+import com.module.system.constants.JwtConstant;
+import com.module.system.constants.ServiceConstant;
+import com.module.system.error.ErrorCodes;
+import com.module.system.utils.JwtUtil;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.scottxuan.web.result.ResultDto;
 import com.service.zuul.auth.AutoMemory;
 import com.service.zuul.enums.UrlType;
-import com.service.zuul.utils.JwtUtil;
 import com.service.zuul.utils.UriMatchUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package com.service.zuul.filters;
 
-import com.module.common.error.ErrorCodes;
+import com.module.system.error.ErrorCodes;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
